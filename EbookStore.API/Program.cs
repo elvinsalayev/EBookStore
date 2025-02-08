@@ -4,6 +4,10 @@ using EbookStore.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using EbookStore.Application.Common.Mappings.Catalog;
 using System.Text.Json.Serialization;
+using EbookStore.Identity.Data;
+using EbookStore.Identity;
+using EbookStore.Identity.Entities;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +26,36 @@ builder.Services.AddDbContext<EbookStoreDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("cString"));
 });
+
+builder.Services.AddDbContext<IdentityDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("cString"));
+});
+builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<IdentityDbContext>()
+                .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<UserManager<AppUser>>();
+builder.Services.AddScoped<SignInManager<AppUser>>();
+builder.Services.AddScoped<RoleManager<AppRole>>();
+
+
+builder.Services.Configure<IdentityOptions>(cfg =>
+{
+    cfg.User.RequireUniqueEmail = true;
+    //cfg.User.AllowedUserNameCharacters = true;
+
+    cfg.Password.RequireNonAlphanumeric = false;
+    cfg.Password.RequireLowercase = false;
+    cfg.Password.RequireUppercase = false;
+    cfg.Password.RequiredLength = 8;
+    cfg.Password.RequireDigit = false;
+    cfg.Password.RequiredUniqueChars = 1;
+
+    cfg.Lockout.MaxFailedAccessAttempts = 3;
+    cfg.Lockout.DefaultLockoutTimeSpan = new TimeSpan(0, 1, 0);
+});
+
+
 builder.Services.AddAutoMapper(typeof(EbookMappingProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly);
 
@@ -54,6 +88,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await EbookStoreDbSeed.InitDbAsync(services);
+    await IdentityDbSeed.InitMembershipAsync(services);
 }
 
 app.Run();
