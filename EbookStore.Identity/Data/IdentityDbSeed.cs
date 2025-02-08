@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EbookStore.Identity
+namespace EbookStore.Identity.Data
 {
     public static class IdentityDbSeed
     {
@@ -15,13 +15,11 @@ namespace EbookStore.Identity
                 var roleManager = scope.ServiceProvider.GetService<RoleManager<AppRole>>();
                 var configuration = scope.ServiceProvider.GetService<IConfiguration>();
 
-                // Xidmətlərin null olub-olmadığını yoxlamaq
                 if (userManager == null || roleManager == null || configuration == null)
                 {
                     throw new InvalidOperationException("Required services are not available in DI container.");
                 }
 
-                // Konfiqurasiya parametrlərinin null olub-olmadığını yoxlamaq
                 var superAdminEmail = configuration["membership:superAdminEmail"];
                 var superAdminName = configuration["membership:superAdminName"];
                 var superAdminSurname = configuration["membership:superAdminSurname"];
@@ -36,12 +34,10 @@ namespace EbookStore.Identity
                     throw new InvalidOperationException("Required configuration values are missing.");
                 }
 
-                // SuperAdmin istifadəçisini tapmaq
                 var user = await userManager.FindByEmailAsync(superAdminEmail);
 
                 if (user == null)
                 {
-                    // SuperAdmin istifadəçisi tapılmadıqda onu yaratmaq
                     user = new AppUser
                     {
                         Name = superAdminName,
@@ -65,19 +61,16 @@ namespace EbookStore.Identity
 
                     if (role == null)
                     {
-                        // Rollar tapılmadıqda yeni rol yaratmaq
                         role = new AppRole { Name = roleName };
                         var roleResult = await roleManager.CreateAsync(role);
 
                         if (roleResult.Succeeded)
                         {
-                            // SuperAdmin istifadəçisini həmin rola əlavə etmək
                             await userManager.AddToRoleAsync(user, roleName);
                         }
                     }
                     else if (!await userManager.IsInRoleAsync(user, roleName))
                     {
-                        // İstifadəçi artıq rolunda deyilsə, əlavə etmək
                         await userManager.AddToRoleAsync(user, roleName);
                     }
                 }

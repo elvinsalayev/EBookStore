@@ -1,13 +1,12 @@
-using EbookStore.Infrastructure.Repositories.Interfaces;
-using EbookStore.Infrastructure.Repositories;
-using EbookStore.Persistence.Data;
-using Microsoft.EntityFrameworkCore;
 using EbookStore.Application.Common.Mappings.Catalog;
-using System.Text.Json.Serialization;
 using EbookStore.Identity.Data;
-using EbookStore.Identity;
 using EbookStore.Identity.Entities;
+using EbookStore.Infrastructure.Repositories;
+using EbookStore.Infrastructure.Repositories.Interfaces;
+using EbookStore.Persistence.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
