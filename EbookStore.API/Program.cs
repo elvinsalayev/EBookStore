@@ -12,14 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddDbContext<EbookStoreDbContext>(options =>
 {
@@ -54,6 +46,17 @@ builder.Services.Configure<IdentityOptions>(cfg =>
     cfg.Lockout.DefaultLockoutTimeSpan = new TimeSpan(0, 1, 0);
 });
 
+//builder.Services.ConfigureApplicationCookie(cfg =>
+//{
+//    cfg.LoginPath = "/login";
+//    cfg.AccessDeniedPath = "/accessdenied";
+//    cfg.LogoutPath = "/logout";
+
+//    cfg.Cookie.Name = "ebookstore";
+//    cfg.Cookie.HttpOnly = true;
+//    cfg.ExpireTimeSpan = new TimeSpan(0, 10, 0);
+//});
+
 
 builder.Services.AddAutoMapper(typeof(EbookMappingProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly);
@@ -67,6 +70,18 @@ builder.Services.AddLogging(loggingBuilder =>
     loggingBuilder.AddConsole();
     loggingBuilder.AddDebug();
 });
+
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+});
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
